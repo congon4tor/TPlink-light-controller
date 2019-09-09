@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>TPlink lights</title>
+
+    <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" -->
+    <!-- integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous"> -->
+
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="node_modules/bootstrap4-toggle/css/bootstrap4-toggle.min.css">
+    <link rel="stylesheet" href="node_modules/bootstrap-slider/dist/css/bootstrap-slider.min.css">
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center mt-3">
+            <div class="card col-8 px-0">
+                <div class="card-header">
+                    TP-Link lightbulbs:
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="form-group">
+                            <select class="form-control mb-2" id="light-select">
+
+                            </select>
+                            <input id="powerToggle" type="checkbox" checked>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-header" style="border-top: 1px solid rgba(0,0,0,.125)">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a href="#color" class="nav-link active" id="color-tab" data-toggle="tab" role="tab"
+                                aria-controls="color" aria-selected="true">Color Mode</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#temp" class="nav-link " id="temp-tab" data-toggle="tab" role="tab"
+                                aria-controls="temp" aria-selected="false">Temp Mode</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="color" role="tabpanel" aria-labelledby="color-tab">
+                            <form>
+                                <div class="form-group">
+                                    <div class="row justify-content-center">
+                                        <div class="colorPicker mt-2"></div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade" id="temp" role="tabpanel" aria-labelledby="temp-tab">
+                            <form>
+                                <div class="form-group">
+                                    <div class="row justify-content-center">
+                                        <div class="col-6">
+                                            <div class="row justify-content-center">
+                                                <input id="temp-slider">
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="row justify-content-center">
+                                                <input id="brightness-slider">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>let $ = require('jquery'); let jQuery = $;</script>
+    <script>require('popper.js');</script>
+    <script>require('bootstrap');</script>
+    <script>require('bootstrap4-toggle');</script>
+    <script src="node_modules/bootstrap-slider/dist/bootstrap-slider.js"></script>
+    <script src="node_modules/@jaames/iro/dist/iro.min.js"></script>
+    <script src="./renderer.js"></script>
+</body>
+
+</html>
