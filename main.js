@@ -1,11 +1,13 @@
 const electron = require("electron");
 const url = require("url");
 const path = require("path");
+const storage = require("electron-json-storage");
 const TPLight = require('tplink-lightbulb')
 
 const { app, BrowserWindow, Menu, ipcMain } = electron;
 
 let lights = [];
+let scenes = [];
 const transition = 500;
 
 //Listen for app to be ready
@@ -23,6 +25,7 @@ app.on('ready', function () {
         x: x,
         y: y,
     });
+
     //Load html into window
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'mainWindow.html'),
@@ -48,6 +51,7 @@ app.on('ready', function () {
 //triggered when view loaded
 ipcMain.on('loaded', function (e) {
     scanLights();
+    loadScenes();
 });
 
 //triggered with on/off toggle
@@ -57,12 +61,41 @@ ipcMain.on('powerToggle', function (e, state, ip) {
 
 //triggered with color change
 ipcMain.on('changeColor', function (e, state, hue, saturation, brightness, ip) {
-    changeColor(state, hue, saturation, brightness, ip);
+    changeLight(state, 0, hue, saturation, brightness, ip);
 });
 
 //triggered with temp change
 ipcMain.on('changeTemp', function (e, state, temp, brightness, ip) {
-    changeTemp(state, temp, brightness, ip);
+    changeLight(state, temp, 0, 0, brightness, ip);
+});
+
+//triggered with add scene
+ipcMain.on('addScene', function (e, name) {
+    addScene(name);
+});
+
+//triggered with delete scene
+ipcMain.on('deleteScene', function (e, index) {
+    deleteScene(index);
+});
+
+//triggered with update scene
+ipcMain.on('updateScene', function (e, index) {
+    updateScene(index);
+});
+
+//triggered with set scene
+ipcMain.on('setScene', function (e, index) {
+    _lights = scenes[index].lights
+    for (const [index, light] of _lights.entries()) {
+        _on_off = light._sysinfo.light_state.on_off
+        _color_temp = (_on_off) ? light._sysinfo.light_state.color_temp : 0
+        _hue = (_on_off) ? light._sysinfo.light_state.hue : 0
+        _saturation = (_on_off) ? light._sysinfo.light_state.saturation : 0
+        _brightness = (_on_off) ? light._sysinfo.light_state.brightness : 0
+        changeLight(_on_off, _color_temp, _hue, _saturation, _brightness, light.ip);
+        sleep(500)
+    }
 });
 
 //Create menu template
@@ -103,32 +136,83 @@ function scanLights() {
         });
 }
 
+function loadScenes() {
+    // delete all scenes
+    scenes = [];
+    storage.get('scenes', function (error, data) {
+        if (!error) {
+            // load scenes
+            scenes = data;
+            mainWindow.webContents.send('scenes-loaded', scenes);
+        }
+    });
+}
+
+function addScene(name) {
+    let scene = { name: name, lights: lights };
+    scenes.push(scene);
+    storage.set('scenes', scenes, function (error) {
+        if (error) console.error(err);
+        loadScenes()
+    });
+
+}
+
+function deleteScene(index) {
+    scenes.splice(index, 1);
+    storage.set('scenes', scenes, function (error) {
+        if (error) console.error(err);
+        loadScenes()
+    });
+}
+
+function updateScene(index) {
+    let scene = { name: scenes[index].name, lights: lights };
+    scenes[index] = scene;
+    storage.set('scenes', scenes, function (error) {
+        if (error) console.error(err);
+        loadScenes()
+    });
+}
+
 function powerLight(state, ip) {
     // turn a light on/off
-    let light = lights.find(light => light.ip == ip);
-    light.power(state, transition)
-        .then(status => {
-            mainWindow.webContents.send('update-light', status, ip);
-        })
-        .catch(err => console.error(err))
+    var light = lights.find(light => light.ip == ip);
+    let index = lights.indexOf(light);
+
+    if (state !== (light._sysinfo.light_state.on_off == 1) ? true : false) {
+        light.power(state, transition)
+            .then(status => {
+                mainWindow.webContents.send('update-light', status, ip);
+                //update light obj
+                light._sysinfo.light_state.on_off = status.on_off
+                lights[index] = light;
+            })
+            .catch(err => console.error(err))
+    }
+
 }
 
-function changeColor(state, hue, saturation, brightness, ip) {
+function changeLight(state, color_temp, hue, saturation, brightness, ip) {
     // change color
     let light = lights.find(light => light.ip == ip);
-    light.power(state, transition, { color_temp: 0, hue, saturation, brightness })
+    let index = lights.indexOf(light);
+
+    light.power(state, transition, { color_temp: color_temp, hue, saturation, brightness })
         .then(status => {
             mainWindow.webContents.send('update-light', status, ip);
+            //update light obj
+            light._sysinfo.light_state.on_off = status.on_off
+            light._sysinfo.light_state.color_temp = status.color_temp
+            light._sysinfo.light_state.hue = status.hue
+            light._sysinfo.light_state.saturation = status.saturation
+            light._sysinfo.light_state.brightness = status.brightness
+            lights[index] = light;
         })
         .catch(err => console.error(err))
+
 }
 
-function changeTemp(state, temp, brightness, ip) {
-    // change temp
-    let light = lights.find(light => light.ip == ip);
-    light.power(state, transition, { color_temp: temp, hue: 0, saturation: 0, brightness: brightness })
-        .then(status => {
-            mainWindow.webContents.send('update-light', status, ip);
-        })
-        .catch(err => console.error(err))
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }

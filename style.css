@@ -64,3 +64,16 @@
 #brightnessSlider .tooltip-inner:after{
     content: " %";
 }
+
+.action-btn{
+    color: #353434;
+}
+
+.action-btn:hover{
+    color: #6e6e6e;
+}
+
+.scene-name:hover{
+    cursor: pointer;
+}
+

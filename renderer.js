@@ -1,6 +1,7 @@
 const { ipcRenderer } = require('electron');
 
 let lights = [];
+let scenes = [];
 let colorPicker;
 let tempSlider;
 let brightnessSlider;
@@ -32,6 +33,19 @@ ipcRenderer.on('light-found', function (e, light) {
             brightnessSlider.bootstrapSlider("setValue", (light._sysinfo.light_state.on_off == 1 ? light._sysinfo.light_state.brightness : light._sysinfo.light_state.dft_on_state.brightness), true, false);
             colorPicker.color.hsl = { h: (light._sysinfo.light_state.on_off == 1 ? light._sysinfo.light_state.hue : light._sysinfo.light_state.dft_on_state.hue), s: (light._sysinfo.light_state.on_off == 1 ? light._sysinfo.light_state.saturation : light._sysinfo.light_state.dft_on_state.saturation), l: (light._sysinfo.light_state.on_off == 1 ? light._sysinfo.light_state.brightness : light._sysinfo.light_state.dft_on_state.brightness) };
         }
+    }
+});
+
+ipcRenderer.on('scenes-loaded', function (e, _scenes) {
+    scenes = _scenes;
+    $('#add-scene-alert').hide(0);
+    $('#scenes-table > tbody').empty();
+    for (const [index, scene] of scenes.entries()) {
+        let row = '<tr><td class="w-75 scene-name" data-id="'+index+'">' + scene.name + '</td><td class="w-25">' + 
+                '<a href="#" class="action-btn action-btn-delete mr-3" data-id="'+index+'" ><i class="fas fa-trash"></i></a>' + 
+                '<a href="#" class="action-btn action-btn-update"  data-id="'+index+'" ><i class="fas fa-sync-alt"></i></a>' + 
+                '</td></tr>';
+        $('#scenes-table > tbody:last-child').append(row);
     }
 });
 
@@ -83,13 +97,12 @@ $(document).ready(function () {
         } else {
             $('#powerToggle').bootstrapToggle('off')
         }
-        console.log(light._sysinfo.light_state)
-        if (!light._sysinfo.light_state.dft_on_state){
+        if (!light._sysinfo.light_state.dft_on_state) {
             color_temp = light._sysinfo.light_state.color_temp;
             hue = light._sysinfo.light_state.hue;
             saturation = light._sysinfo.light_state.saturation;
             brightness = light._sysinfo.light_state.brightness;
-        }else{
+        } else {
             color_temp = light._sysinfo.light_state.dft_on_state.color_temp;
             hue = light._sysinfo.light_state.dft_on_state.hue;
             saturation = light._sysinfo.light_state.dft_on_state.saturation;
@@ -102,9 +115,9 @@ $(document).ready(function () {
         } else {
             //temp mode
             $('#temp-tab').tab('show');
-            tempSlider.bootstrapSlider("setValue", color_temp , true, false);
-            brightnessSlider.bootstrapSlider("setValue", brightness , true, false);
-            colorPicker.color.hsl = { h: hue , s:  saturation, l:  brightness };
+            tempSlider.bootstrapSlider("setValue", color_temp, true, false);
+            brightnessSlider.bootstrapSlider("setValue", brightness, true, false);
+            colorPicker.color.hsl = { h: hue, s: saturation, l: brightness };
         }
     });
 
@@ -136,7 +149,6 @@ $(document).ready(function () {
     });
 
     brightnessSlider.on('change', function (e) {
-        //TODO: change brightness
         ipcRenderer.send('changeTemp', true, tempSlider.bootstrapSlider('getValue'), e.value.newValue, JSON.parse($('#light-select').val()).ip);
     });
 
@@ -155,6 +167,29 @@ $(document).ready(function () {
         ipcRenderer.send('changeColor', true, color.hsl.h, color.hsl.s, color.hsl.l, JSON.parse($('#light-select').val()).ip);
     });
 
+
+    $("#add-scene-btn").click(function (e) {
+        e.preventDefault();
+        let scene = scenes.find(scene => scene.name == $("#scene-name-input").val());
+        if (!scene) {
+            ipcRenderer.send('addScene', $("#scene-name-input").val());
+        } else {
+            $('#add-scene-alert').show(0);
+        }
+    });
+
+
+    $(document).on( 'click', ".action-btn-delete", function(e){
+        ipcRenderer.send('deleteScene', $(this).data("id"));
+    } );
+
+    $(document).on( 'click', ".action-btn-update", function(e){
+        ipcRenderer.send('updateScene', $(this).data("id"));
+    } );
+
+    $(document).on( 'click', ".scene-name", function(e){
+        ipcRenderer.send('setScene', $(this).data("id"));
+    } );
 
     $('[data-toggle="tooltip"]').tooltip();
 

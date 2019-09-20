@@ -4,8 +4,7 @@
 <head>
     <title>TPlink lights</title>
 
-    <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" -->
-    <!-- integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous"> -->
+    <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css">
 
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
 
@@ -19,59 +18,107 @@
         <div class="row justify-content-center mt-3">
             <div class="card col-8 px-0">
                 <div class="card-header">
-                    TP-Link lightbulbs:
-                </div>
-                <div class="card-body">
-                    <form>
-                        <div class="form-group">
-                            <select class="form-control mb-2" id="light-select">
-
-                            </select>
-                            <input id="powerToggle" type="checkbox" checked>
-                        </div>
-                    </form>
-                </div>
-                <div class="card-header" style="border-top: 1px solid rgba(0,0,0,.125)">
                     <ul class="nav nav-tabs card-header-tabs" role="tablist">
                         <li class="nav-item">
-                            <a href="#color" class="nav-link active" id="color-tab" data-toggle="tab" role="tab"
-                                aria-controls="color" aria-selected="true">Color Mode</a>
+                            <a href="#lights" class="nav-link active" id="lights-tab" data-toggle="tab" role="tab"
+                                aria-controls="lights" aria-selected="true"><i class="fas fa-lightbulb"></i> Lights</a>
                         </li>
                         <li class="nav-item">
-                            <a href="#temp" class="nav-link " id="temp-tab" data-toggle="tab" role="tab"
-                                aria-controls="temp" aria-selected="false">Temp Mode</a>
+                            <a href="#scenes" class="nav-link " id="scenes-tab" data-toggle="tab" role="tab"
+                                aria-controls="scenes" aria-selected="false"><i class="fas fa-th-large"></i> Scenes</a>
                         </li>
                     </ul>
                 </div>
-                <div class="card-body">
-                    <div class="tab-content">
-                        <div class="tab-pane fade show active" id="color" role="tabpanel" aria-labelledby="color-tab">
+                <div class="tab-content" id="myTabContent2">
+                    <!-- Lights Tab -->
+                    <div class="tab-pane fade show active" id="lights" role="tabpanel" aria-labelledby="lights-tab">
+                        <div class="card-body">
                             <form>
                                 <div class="form-group">
-                                    <div class="row justify-content-center">
-                                        <div class="colorPicker mt-2"></div>
-                                    </div>
+                                    <select class="form-control mb-2" id="light-select">
+
+                                    </select>
+                                    <input id="powerToggle" type="checkbox" checked>
                                 </div>
                             </form>
                         </div>
-                        <div class="tab-pane fade" id="temp" role="tabpanel" aria-labelledby="temp-tab">
-                            <form>
-                                <div class="form-group">
-                                    <div class="row justify-content-center">
-                                        <div class="col-6">
-                                            <div class="row justify-content-center">
-                                                <input id="temp-slider">
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="row justify-content-center">
-                                                <input id="brightness-slider">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
+                        <div class="card-header" style="border-top: 1px solid rgba(0,0,0,.125)">
+                            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a href="#color" class="nav-link active" id="color-tab" data-toggle="tab" role="tab"
+                                        aria-controls="color" aria-selected="true"><i class="fas fa-palette"></i> Colour</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#temp" class="nav-link " id="temp-tab" data-toggle="tab" role="tab"
+                                        aria-controls="temp" aria-selected="false"><i class="fas fa-thermometer-three-quarters"></i> Temperature</a>
+                                </li>
+                            </ul>
                         </div>
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <!-- Color Tab -->
+                                <div class="tab-pane fade show active" id="color" role="tabpanel"
+                                    aria-labelledby="color-tab">
+                                    <form>
+                                        <div class="form-group">
+                                            <div class="row justify-content-center">
+                                                <div class="colorPicker mt-2"></div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!-- Temp Tab -->
+                                <div class="tab-pane fade" id="temp" role="tabpanel" aria-labelledby="temp-tab">
+                                    <form>
+                                        <div class="form-group">
+                                            <div class="row justify-content-center">
+                                                <div class="col-6">
+                                                    <div class="row justify-content-center">
+                                                        <input id="temp-slider">
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="row justify-content-center">
+                                                        <input id="brightness-slider">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Scenes tab -->
+                    <div class="tab-pane fade" id="scenes" role="tabpanel" aria-labelledby="scenes-tab">
+                        <form id="add-scene-form">
+                            <div class="input-group my-3 px-3">
+                                <div class="alert alert-danger alert-dismissible" id="add-scene-alert"
+                                    style="display: none" role="alert">
+                                    A scene with this name already exists.
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Scene name" aria-label="Scene name"
+                                    aria-describedby="basic-addon2" id="scene-name-input">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="submit" id="add-scene-btn">Add
+                                        scene</button>
+                                </div>
+                            </div>
+                        </form>
+                        <table class="table table-hover" id="scenes-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- table body -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

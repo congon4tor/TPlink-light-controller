@@ -5,16 +5,18 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-packager . 'TP-Lights' --overwrite --asar --icon=bulb.png --out=releases"
+    "build": "electron-packager . 'TP-Lights' --overwrite --asar --icon=/home/congo/Desktop/Stuff/projects/tplink/bulb.png --out=releases"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.11.1",
     "@jaames/iro": "^4.5.1",
     "bootstrap": "^4.3.1",
     "bootstrap-slider": "^10.6.2",
     "bootstrap4-toggle": "^3.5.0",
     "electron": "^6.0.7",
+    "electron-json-storage": "^4.1.8",
     "jquery": "^3.4.1",
     "popper.js": "^1.15.0",
     "tplink-lightbulb": "^1.5.1"
@@ -23,4 +25,3 @@
     "electron-packager": "^14.0.6"
   }
 }
-//remember to make changes to the bootstrapslider js to change class 'in' for 'show' to show tooltips
