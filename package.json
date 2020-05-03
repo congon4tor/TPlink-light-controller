@@ -17,7 +17,7 @@
     "bootstrap4-toggle": "^3.5.0",
     "electron": "^6.0.7",
     "electron-json-storage": "^4.1.8",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "popper.js": "^1.15.0",
     "tplink-lightbulb": "^1.5.1"
   },
